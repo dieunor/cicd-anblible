@@ -4,21 +4,22 @@ properties([
         choice(choices: ['Dry-Run','Playbook-deploy'], name: 'Playbook Action')
     ])
 ])
+
 pipeline {
     agent any 
     stages {
         stage('Preparing') {
-            steps{
+            steps {
                 sh 'echo Preparing'
             }
         }
         stage('Git Pulling') {
-            steps{
+            steps {
                 git branch: 'main', url: 'https://github.com/dieunor/cicd-anblible.git'
             }
         }
         stage('Playbook Initializing') {
-            steps{
+            steps {
                 sh 'echo Playbook Initializing'
             }
         }
@@ -29,7 +30,11 @@ pipeline {
             steps {
                 script {
                     if (params['Playbook Action'] == 'Dry-Run') {
-                        sh "ansible-playbook --check -i /etc/ansible/hosts --private-key ${credentials('ansible-connect')} ${params["Playbook Name"]}.yml"
+                        withCredentials([sshUserPrivateKey(credentialsId: 'ansible-connect', keyFileVariable: 'SSH_KEY')]) {
+                            sh """
+                            ansible-playbook --check -i /etc/ansible/hosts --private-key $SSH_KEY ${params['Playbook Name']}.yml
+                            """
+                        }
                     } else if (params['Playbook Action'] == 'Playbook-deploy') {
                         ansiblePlaybook credentialsId: 'ansible-connect', disableHostKeyChecking: true, inventory: '/etc/ansible/hosts', playbook: 'nginx-Uninstallation.yml', vaultTmpPath: ''
                     }
@@ -37,7 +42,7 @@ pipeline {
             }
         }
         stage('Playbook deployed') {
-            steps{
+            steps {
                 sh 'echo Deployment done!!!!'
             }
         }
