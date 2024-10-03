@@ -31,9 +31,9 @@ pipeline {
                 script {
                     if (params['Playbook Action'] == 'Dry-Run') {
                         withCredentials([sshUserPrivateKey(credentialsId: 'ansible-connect', keyFileVariable: 'SSH_KEY')]) {
-                            sh """
-                            ansible-playbook --check -i /etc/ansible/hosts --private-key $SSH_KEY ${params['Playbook Name']}.yml
-                            """
+                            sh '''
+                            ansible-playbook --check -i /etc/ansible/hosts --private-key "$SSH_KEY" ${params.PlaybookName}.yml
+                            '''
                         }
                     } else if (params['Playbook Action'] == 'Playbook-deploy') {
                         ansiblePlaybook credentialsId: 'ansible-connect', disableHostKeyChecking: true, inventory: '/etc/ansible/hosts', playbook: 'nginx-Uninstallation.yml', vaultTmpPath: ''
