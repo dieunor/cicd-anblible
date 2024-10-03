@@ -14,7 +14,7 @@ pipeline {
         }
         stage('Git Pulling') {
             steps{
-                git branch: 'master', url: 'https://github.com/AmanPathak-DevOps/CICD-Ansible.git'
+                git branch: 'main', url: 'https://github.com/dieunor/cicd-anblible.git'
             }
         }
         stage('Playbook Initializing') {
